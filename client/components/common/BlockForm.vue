@@ -12,19 +12,35 @@
         :key="field.id"
       >
         <label :for="field.id">{{ field.label }}:</label>
-        <textarea
-          v-if="field.id === 'content'"
-          :name="field.id"
-          :value="field.value"
-          @input="field.value = $event.target.value"
-        />
-        <input
-          v-else
-          :type="field.id === 'password' ? 'password' : 'text'"
-          :name="field.id"
-          :value="field.value"
-          @input="field.value = $event.target.value"
-        >
+        <div v-if="field.type=== 'text'">
+          <textarea
+            v-if="field.id === 'content'"
+            :name="field.id"
+            :value="field.value"
+            @input="field.value = $event.target.value"
+          />
+          <input
+            v-else
+            :type="field.id === 'password' ? 'password' : 'text'"
+            :name="field.id"
+            :value="field.value"
+            @input="field.value = $event.target.value"
+          >
+        </div>
+        <div v-if="field.type=== 'date'">
+          <input type="date"
+            :value="field.valueAsDate"
+            :name="field.id"
+            @input="field.value = $event.target.valueAsDate"
+          />
+        </div>
+        <div v-if="field.type=== 'time'">
+          <input type="time"
+            :value="field.valueAsDate"
+            :name="field.id"
+            @input="field.value = $event.target.value"
+          />
+        </div>
       </div>
     </article>
     <article v-else>
@@ -126,7 +142,7 @@ form {
   position: relative;
 }
 
-article > div {
+article > div > div {
   display: flex;
   flex-direction: column;
 }

@@ -10,7 +10,9 @@ const isFreetExists = async (req: Request, res: Response, next: NextFunction) =>
   const freet = validFormat ? await FreetCollection.findOne(req.params.freetId) : '';
   if (!freet) {
     res.status(404).json({
-      error: `Freet with freet ID ${req.params.freetId} does not exist.`
+      error: {
+        freetNotFound: `Freet with freet ID ${req.params.freetId} does not exist.`
+      }
     });
     return;
   }
@@ -51,7 +53,26 @@ const isValidFreetModifier = async (req: Request, res: Response, next: NextFunct
     res.status(403).json({
       error: 'Cannot modify other users\' freets.'
     });
-    return;
+    return; 
+  }
+
+  next();
+};
+
+/**
+ * Checks if scheduled date is in future
+ */
+ const isFutureTime = async (req: Request, res: Response, next: NextFunction) => {
+  const date = new Date();
+  const scheduledDate = new Date(req.body.scheduledDate).getTime();
+  const dateAndTime = scheduledDate + new Date(req.body.scheduledTime).getTime();
+  const scheduled = new Date(dateAndTime);
+
+  if (scheduled < date) {
+    res.status(403).json({
+      error: 'Cannot schedule for a past date/time'
+    });
+    return; 
   }
 
   next();
@@ -60,5 +81,6 @@ const isValidFreetModifier = async (req: Request, res: Response, next: NextFunct
 export {
   isValidFreetContent,
   isFreetExists,
-  isValidFreetModifier
+  isValidFreetModifier,
+  isFutureTime
 };

@@ -10,6 +10,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     filter: null, // Username to filter shown freets by (null = show all)
+    pageView: null,
     freets: [], // All freets created in the app
     username: null, // Username of the logged in user
     alerts: {} // global success/error messages encountered during submissions to non-visible forms
@@ -38,6 +39,13 @@ const store = new Vuex.Store({
        */
       state.filter = filter;
     },
+    updatePageview(state, pageView) {
+      /**
+       * Update the stored freets filter to the specified one.
+       * @param pageView - either home, trending, or null
+       */
+      state.pageView = pageView;
+    },
     updateFreets(state, freets) {
       /**
        * Update the stored freets to the provided freets.
@@ -49,8 +57,12 @@ const store = new Vuex.Store({
       /**
        * Request the server for the currently available freets.
        */
-      const url = state.filter ? `/api/users/${state.filter}/freets` : '/api/freets';
+      // const url = state.filter ? `/api/users/${state.filter}/freets` : '/api/freets';
+      const url = state.filter ? `/api/freets?author=${state.filter}` : '/api/freets';
+
       const res = await fetch(url).then(async r => r.json());
+      state.pageView = null;
+      state.filter = null;
       state.freets = res;
     }
   },

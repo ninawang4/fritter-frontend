@@ -25,12 +25,39 @@
       <header>
         <div class="left">
           <h2>
-            Viewing all freets
             <span v-if="$store.state.filter">
-              by @{{ $store.state.filter }}
+              Viewing all freets by @{{ $store.state.filter }}
+            </span>
+            <span v-else-if="$store.state.pageView === 'home'">
+              Viewing Home Page
+            </span>
+            <span v-else-if="$store.state.pageView === 'trending'">
+              Viewing Trending Page
+            </span>
+            <span v-else>
+              Viewing all freets
             </span>
           </h2>
         </div>
+        <div>
+
+          <GetPageView
+            ref="getPageView"
+            value="page"
+            button="Home Page"
+          />
+          <GetPageView
+            ref="getPageView"
+            value="page"
+            button="Trending Freets"
+          />
+          <GetPageView
+            ref="getPageView"
+            value="view-all"
+            button="View all Freets"
+          />
+        </div>
+
         <div class="right">
           <GetFreetsForm
             ref="getFreetsForm"
@@ -62,10 +89,11 @@
 import FreetComponent from '@/components/Freet/FreetComponent.vue';
 import CreateFreetForm from '@/components/Freet/CreateFreetForm.vue';
 import GetFreetsForm from '@/components/Freet/GetFreetsForm.vue';
+import GetPageView from '@/components/Freet/GetPageView.vue';
 
 export default {
   name: 'FreetPage',
-  components: {FreetComponent, GetFreetsForm, CreateFreetForm},
+  components: {FreetComponent, GetFreetsForm, GetPageView, CreateFreetForm},
   mounted() {
     this.$refs.getFreetsForm.submit();
   }

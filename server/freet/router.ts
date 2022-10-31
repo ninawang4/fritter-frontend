@@ -1,9 +1,10 @@
 import type {NextFunction, Request, Response} from 'express';
 import express from 'express';
 import FreetCollection from './collection';
+import UserCollection from '../user/collection';
 import * as userValidator from '../user/middleware';
 import * as freetValidator from '../freet/middleware';
-import * as util from './util';
+;import * as util from './util';
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ const router = express.Router();
  * @throws {404} - If no user has given author
  *
  */
-router.get(
+ router.get(
   '/',
   async (req: Request, res: Response, next: NextFunction) => {
     // Check if author query parameter was supplied
@@ -54,6 +55,9 @@ router.get(
  * @name POST /api/freets
  *
  * @param {string} content - The content of the freet
+ * @param {Date} scheduledDate - the time the tweet is scheduled to be posted (if any)
+ * @param {Time} scheduledTime - the time the tweet is scheduled to be posted (if any)
+
  * @return {FreetResponse} - The created freet
  * @throws {403} - If the user is not logged in
  * @throws {400} - If the freet content is empty or a stream of empty spaces
@@ -63,12 +67,19 @@ router.post(
   '/',
   [
     userValidator.isUserLoggedIn,
-    freetValidator.isValidFreetContent
+    freetValidator.isValidFreetContent,
+    freetValidator.isFutureTime,
   ],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
-    const freet = await FreetCollection.addOne(userId, req.body.content);
+    const timeString = '1970-01-01T17:'.concat(req.body.scheduledTime.concat('.000Z'));
+    const scheduledDate = new Date(req.body.scheduledDate).getTime();
+    const dateAndTime = scheduledDate + Date.parse(timeString);
 
+    const scheduled = new Date(dateAndTime);
+
+
+    const freet = await FreetCollection.addOne(userId, req.body.content, scheduled);
     res.status(201).json({
       message: 'Your freet was created successfully.',
       freet: util.constructFreetResponse(freet)
@@ -104,7 +115,7 @@ router.delete(
 /**
  * Modify a freet
  *
- * @name PATCH /api/freets/:id
+ * @name PUT /api/freets/:id
  *
  * @param {string} content - the new content for the freet
  * @return {FreetResponse} - the updated freet
@@ -114,7 +125,7 @@ router.delete(
  * @throws {400} - If the freet content is empty or a stream of empty spaces
  * @throws {413} - If the freet content is more than 140 characters long
  */
-router.patch(
+router.put(
   '/:freetId?',
   [
     userValidator.isUserLoggedIn,
@@ -129,6 +140,36 @@ router.patch(
       freet: util.constructFreetResponse(freet)
     });
   }
+);
+
+/**
+ * Get all the freets for a given page
+ *
+ * @name GET /api/freets
+ *
+ * @param {string} page - The page user wants to view
+ * @return {FreetResponse[]} - A list of all the freets sorted in descending
+ *                      order by date modified
+ */
+ router.get(
+  '/:page?',
+  async (req: Request, res: Response) => {
+    let pageView;
+  
+    if (req.params.page == 'home') {
+      console.log('HOMEPAGE');
+      const user = UserCollection.findOneByUserId(req.session.userId);
+      const following = (await user).following;
+      pageView = await FreetCollection.findHomeFreets(following);
+    } else if (req.params.page == 'trending'){
+      pageView = await FreetCollection.findTrendingFreets();
+    }
+  //   const user = UserCollection.findOneByUserId(req.session.userId);
+  //   const following = (await user).following;
+  //   const homepage = await FreetCollection.findHomeFreets(following)
+    const response = pageView.map(util.constructFreetResponse);
+    res.status(200).json(response);
+  },
 );
 
 export {router as freetRouter};

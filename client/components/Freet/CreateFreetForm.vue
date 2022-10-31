@@ -12,8 +12,12 @@ export default {
       method: 'POST',
       hasBody: true,
       fields: [
-        {id: 'content', label: 'Content', value: ''}
+        {id: 'content', type: 'text', label: 'Content', value: ''},
+        {id: 'scheduledDate', type: 'date', label: 'Scheduled Date (optional)', value: ''}, 
+        {id: 'scheduledTime', type: 'time', label: 'Scheduled Time (optional)', value: ''} 
+
       ],
+      
       title: 'Create a freet',
       refreshFreets: true,
       callback: () => {

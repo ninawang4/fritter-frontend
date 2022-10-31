@@ -68,7 +68,7 @@
 export default {
   name: 'FreetComponent',
   props: {
-    // Data from the stored freet
+    // Data from the stored freet (coming from store)
     freet: {
       type: Object,
       required: true

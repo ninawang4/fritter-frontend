@@ -1,28 +1,42 @@
 <!-- Form for getting freets (all, from user) (inline style) -->
 
 <script>
-import InlineForm from '@/components/common/InlineForm.vue';
+import Button from '@/components/common/Button.vue';
+
 
 export default {
-  name: 'GetFreetsForm',
-  mixins: [InlineForm],
+  name: 'GetPageView',
+  mixins: [Button],
   data() {
     return {
-      value: this.$store.state.filter,
-      refreshFreets: true
+        value: this.$store.state.pageView,
+        refreshFreets: true
     };
   },
   methods: {
-    async submit() { 
-      const url = this.value ? `/api/freets?author=${this.value}` : '/api/freets';
+    async submit() {
+        var url;
+        var pageView;
+
+        if (this.button === 'Home Page') {
+            url ='/api/page?page=home';
+            this.$store.commit('updatePageview', 'home');
+        } else if (this.button === 'View all Freets') {
+            url = '/api/freets';
+            this.$store.commit('updatePageview', null);
+        } else if (this.button === 'Trending Freets') {
+            url = '/api/page?page=trending';
+            this.$store.commit('updatePageview', 'trending');
+        };
+        this.value = '';
       try {
         const r = await fetch(url);
         const res = await r.json();
         if (!r.ok) {
           throw new Error(res.error);
+        } else {
+            console.log('yay worked');
         }
-
-        this.$store.commit('updateFilter', this.value);
         this.$store.commit('updateFreets', res);
       } catch (e) {
         if (this.value === this.$store.state.filter) {
@@ -44,3 +58,5 @@ export default {
   }
 };
 </script>
+
+
