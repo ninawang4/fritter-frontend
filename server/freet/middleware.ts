@@ -64,9 +64,19 @@ const isValidFreetModifier = async (req: Request, res: Response, next: NextFunct
  */
  const isFutureTime = async (req: Request, res: Response, next: NextFunction) => {
   const date = new Date();
-  const scheduledDate = new Date(req.body.scheduledDate).getTime();
-  const dateAndTime = scheduledDate + new Date(req.body.scheduledTime).getTime();
-  const scheduled = new Date(dateAndTime);
+  var scheduled;
+
+  // console.log(req.body.scheduledTime);
+  if (req.body.scheduledTime === ''){
+    scheduled = new Date(req.body.scheduledDate);
+  } else {
+    const timeString = '1970-01-01T17:'.concat(req.body.scheduledTime.concat('.000Z'));
+    console.log(timeString);
+    const scheduledDate = new Date(req.body.scheduledDate).getTime();
+    const dateAndTime = scheduledDate + Date.parse(timeString);
+
+    scheduled = new Date(dateAndTime);
+  }
 
   if (scheduled < date) {
     res.status(403).json({

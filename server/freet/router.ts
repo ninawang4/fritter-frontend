@@ -72,11 +72,19 @@ router.post(
   ],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
-    const timeString = '1970-01-01T17:'.concat(req.body.scheduledTime.concat('.000Z'));
-    const scheduledDate = new Date(req.body.scheduledDate).getTime();
-    const dateAndTime = scheduledDate + Date.parse(timeString);
+    var scheduled;
 
-    const scheduled = new Date(dateAndTime);
+    console.log(req.body.scheduledTime);
+    if (req.body.scheduledTime === ''){
+      scheduled = new Date(req.body.scheduledDate);
+    } else {
+      const timeString = '1970-01-01T17:'.concat(req.body.scheduledTime.concat('.000Z'));
+      console.log(timeString);
+      const scheduledDate = new Date(req.body.scheduledDate).getTime();
+      const dateAndTime = scheduledDate + Date.parse(timeString);
+
+      scheduled = new Date(dateAndTime);
+    }
 
 
     const freet = await FreetCollection.addOne(userId, req.body.content, scheduled);
