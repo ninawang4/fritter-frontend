@@ -4,6 +4,7 @@ import CommentCollection from './collection';
 import * as userValidator from '../user/middleware';
 import * as freetValidator from '../freet/middleware';
 import * as commentValidator from './middleware';
+import CommentModel from './model';
 // import * as util from '../freet/util';
 
 const router = express.Router();
@@ -56,7 +57,11 @@ router.delete(
     commentValidator.didUserComment,
   ],
   async (req: Request, res: Response) => {
-    await CommentCollection.deleteComment(req.params.commentId);
+    // await CommentCollection.deleteComment(req.params.commentId)
+    await CommentModel.findByIdAndDelete(req.params.commentId);
+    const comment = await CommentModel.findById(req.params.commentId);
+    console.log(comment);
+    
     res.status(200).json({
       message: 'Your comment was deleted successfully.'
     });

@@ -60,7 +60,7 @@
           <br />
 
           <img src="../../../client/public/images/comments.png" margin="12px" @click="showComments"/>
-          <div>{{comments.length}} comments</div>
+          <div>{{comments}} comments</div>
     </div>
     <section v-if="commentView">
       <CreateCommentForm
@@ -68,7 +68,7 @@
         :freet = "freet"
       />
       <CommentComponent
-        v-for="comment in comments"
+        v-for="comment in freet.comment"
         :key="comment.id"
         :comment="comment"
       />
@@ -110,7 +110,7 @@ export default {
       alerts: {}, // Displays success/error messages encountered during freet modification
       upvotes: this.freet.upvotes,
       upvoted : false,
-      comments: this.freet.comment,
+      comments: this.freet.comment.length,
       commentView: false
     };
   },

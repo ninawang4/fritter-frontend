@@ -2,7 +2,7 @@
     <article class="comment">
     <header>
       <h3 class="author">@{{ comment.username }}</h3>
-      <button @click="deleteComment">Delete Comment</button>
+      <!-- <button @click="deleteComment">Delete Comment</button> -->
     </header>     
     <p class="content">
       {{comment.content}}
