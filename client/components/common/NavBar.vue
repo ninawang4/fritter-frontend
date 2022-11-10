@@ -42,8 +42,8 @@
 <style scoped>
 nav {
     padding: 1vw 2vw;
-    background-color: #ccc;
     display: flex;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     justify-content: space-between;
     align-items: center;
     position: relative;
@@ -73,6 +73,19 @@ img {
 
 .right a {
     margin-left: 5px;
+}
+
+a:link {
+  text-decoration: none;
+  color: black;
+}
+
+a:visited {
+  color: black;
+}
+
+a:hover {
+  color: #729e85;
 }
 
 .alerts {

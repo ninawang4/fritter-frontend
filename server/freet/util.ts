@@ -45,7 +45,7 @@ const constructFreetResponse = (freet: HydratedDocument<Freet>): FreetResponse =
     ...freetCopy,
     _id: freetCopy._id.toString(),
     author: username,
-    upvoters: freet.upvoters.map(upvoter => upvoter.toString()),
+    upvoters: freet.upvoters.map(upvoter  => upvoter != null ? upvoter.toString() : ''),
     upvotes: freet.upvotes,
     engagement: freet.engagement,
     scheduledTime: formatDate(freet.scheduledTime),

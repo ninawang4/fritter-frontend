@@ -28,7 +28,9 @@ const router = express.Router();
         pageView = await FreetCollection.findHomeFreets(following);
       } else if (req.query.page == 'trending'){
         pageView = await FreetCollection.findTrendingFreets();
-      }
+      } else if (req.query.page == 'drafts') {
+        pageView = await FreetCollection.findDrafts(req.session.userId);
+      };
     //   const user = UserCollection.findOneByUserId(req.session.userId);
     //   const following = (await user).following;
     //   const homepage = await FreetCollection.findHomeFreets(following)

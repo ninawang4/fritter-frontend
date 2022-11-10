@@ -27,20 +27,23 @@
             @input="field.value = $event.target.value"
           >
         </div>
+        <div>
         <div v-if="field.type=== 'date'">
-          <input type="date"
-            :value="field.valueAsDate"
-            :name="field.id"
-            @input="field.value = $event.target.valueAsDate"
-          />
+            <input type="date"
+              :value="field.valueAsDate"
+              :name="field.id"
+              @input="field.value = $event.target.valueAsDate"
+            />
+          </div>
+          <div v-if="field.type=== 'time'">
+            <input type="time"
+              :value="field.valueAsDate"
+              :name="field.id"
+              @input="field.value = $event.target.value"
+            />
+          </div>
         </div>
-        <div v-if="field.type=== 'time'">
-          <input type="time"
-            :value="field.valueAsDate"
-            :name="field.id"
-            @input="field.value = $event.target.value"
-          />
-        </div>
+          
       </div>
     </article>
     <article v-else>
@@ -133,8 +136,10 @@ export default {
 
 <style scoped>
 form {
-  border: 1px solid #111;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  border-top: 0px solid #111;
   padding: 0.5rem;
+  margin: 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -158,6 +163,17 @@ form > * {
 
 form h3 {
   margin-top: 0;
+}
+
+button {
+  background-color: #abd6be; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 22px;
 }
 
 textarea {

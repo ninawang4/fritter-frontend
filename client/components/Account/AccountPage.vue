@@ -36,3 +36,11 @@ export default {
   }
 };
 </script>
+
+<style>
+
+h2 {
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+</style>

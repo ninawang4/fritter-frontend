@@ -1,31 +1,37 @@
-<!-- Form for creating freets (block style) -->
 
 <script>
 import BlockForm from '@/components/common/BlockForm.vue';
 
 export default {
-  name: 'CreateFreetForm',
+  name: 'CreateCommentForm',
   mixins: [BlockForm],
+  props: {
+    freet: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
+    // console.log(this.freet);
     return {
-      url: '/api/freets',
-      method: 'POST', 
+      url: `/api/comment/${this.freet._id}`,
+      method: 'PUT', 
       hasBody: true,
       fields: [
         {id: 'content', type: 'text', label: 'Content', value: ''},
-        {id: 'scheduledDate', type: 'date', label: 'Scheduled Date (optional)', value: ''}, 
-        {id: 'scheduledTime', type: 'time', label: 'Scheduled Time (optional)', value: ''} 
-
       ],
       
-      title: 'Create a freet',
+      title: 'Leave a Comment',
       refreshFreets: true,
       callback: () => {
-        const message = 'Successfully created a freet!';
+        const message = 'Successfully created a comment!';
         this.$set(this.alerts, message, 'success');
         setTimeout(() => this.$delete(this.alerts, message), 3000);
+        this.$store.commit('updateFreets');
+        this.$store.commit('refreshFreets');
       }
     };
   }
 };
 </script>
+

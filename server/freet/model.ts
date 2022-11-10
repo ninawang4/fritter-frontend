@@ -11,7 +11,7 @@ export type Freet = {
   dateCreated: Date;
   comment: [Comment];
   scheduledTime: Date;
-  upvoters: [Types.ObjectId | string];
+  upvoters: [string];
   upvotes: Number;
   engagement: Number;
   content: string;
@@ -29,7 +29,7 @@ export type PopulatedFreet = {
   // ];
   comment: [Comment];
   scheduledTime: Date;
-  upvoters: [Types.ObjectId | string];
+  upvoters: [string];
   upvotes: Number;
   engagement: Number;
   content: string;
@@ -62,7 +62,7 @@ const FreetSchema = new Schema<Freet>({
 
   comment: [],
 
-  upvoters: [Schema.Types.ObjectId,],
+  upvoters: [String,],
 
   upvotes: {
     type: Number,

@@ -32,6 +32,17 @@ form {
     position: relative;
 }
 
+button {
+  /* background-color: #abd6be; Green */
+  border: none;
+  color: black;
+  padding: 8px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
 input {
     padding: 0 5px;
     min-width: 200px;

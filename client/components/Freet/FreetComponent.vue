@@ -9,7 +9,24 @@
       <h3 class="author">
         @{{ freet.author }}
       </h3>
-      <div
+    </header>
+    <textarea
+      v-if="editing"
+      class="content"
+      :value="draft"
+      @input="draft = $event.target.value"
+    />
+    <p
+      v-else
+      class="content"
+    >
+      {{ freet.content }}
+    </p>
+    <p class="info">
+      {{ freet.dateModified }}
+      <i v-if="freet.edited">(edited)</i>
+    </p>
+    <div
         v-if="$store.state.username === freet.author"
         class="actions"
       >
@@ -35,23 +52,27 @@
           🗑️ Delete
         </button>
       </div>
-    </header>
-    <textarea
-      v-if="editing"
-      class="content"
-      :value="draft"
-      @input="draft = $event.target.value"
-    />
-    <p
-      v-else
-      class="content"
-    >
-      {{ freet.content }}
-    </p>
-    <p class="info">
-      Posted at {{ freet.dateModified }}
-      <i v-if="freet.edited">(edited)</i>
-    </p>
+    <div class="row">
+        <img v-if="upvoted" src="../../../client/dist/img/likedalready.png" @click="upvoteFreet"/>
+
+          <img v-else src="../../../client/dist/img/newlike.png" @click="upvoteFreet"/>
+          <div>{{freet.upvotes}} likes</div>
+          <br />
+
+          <img src="../../../client/dist/img/comments.png" margin="12px" @click="showComments"/>
+          <div>{{comments.length}} comments</div>
+    </div>
+    <section v-if="commentView">
+      <CreateCommentForm
+        :id="freet.id"
+        :freet = "freet"
+      />
+      <CommentComponent
+        v-for="comment in comments"
+        :key="comment.id"
+        :comment="comment"
+      />
+    </section>
     <section class="alerts">
       <article
         v-for="(status, alert, index) in alerts"
@@ -65,8 +86,16 @@
 </template>
 
 <script>
+import CommentComponent from '@/components/Freet/CommentComponent.vue';
+import CreateCommentForm from '@/components/Freet/CreateCommentForm.vue';
+
+// components: {
+//   CreateCommentForm: () => import('@/components/Freet/CreateCommentForm.vue')
+// }
+
 export default {
   name: 'FreetComponent',
+  components: {CommentComponent, CreateCommentForm},
   props: {
     // Data from the stored freet (coming from store)
     freet: {
@@ -78,7 +107,11 @@ export default {
     return {
       editing: false, // Whether or not this freet is in edit mode
       draft: this.freet.content, // Potentially-new content for this freet
-      alerts: {} // Displays success/error messages encountered during freet modification
+      alerts: {}, // Displays success/error messages encountered during freet modification
+      upvotes: this.freet.upvotes,
+      upvoted : false,
+      comments: this.freet.comment,
+      commentView: false
     };
   },
   methods: {
@@ -95,6 +128,39 @@ export default {
        */
       this.editing = false;
       this.draft = this.freet.content;
+    },
+    upvoteFreet() {
+      // this.upvotes ++;
+      const params = {
+        method: 'PUT',
+        url: '/api/upvote',
+        callback: () => {
+          this.$store.commit('alert', {
+            message: 'Successfully upvoted freet!', status: 'success'
+          });
+        },
+      };
+      try {
+        this.request(params);
+        this.$store.commit('updateFreets');
+        this.$store.commit('refreshFreets');
+        if (this.upvoted === false) {
+          this.upvoted = true;
+        } else {
+          this.upvoted = false;
+        };
+      } catch(e) {
+        this.$set(this.alerts, 'Cannot upvote more than once', 'Cannot upvote more than once');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      } 
+    },
+    showComments() {
+      console.log('hi');
+      if (this.commentView == true) {
+        this.commentView = false;
+      } else {
+        this.commentView = true;
+      }
     },
     deleteFreet() {
       /**
@@ -147,7 +213,14 @@ export default {
       }
 
       try {
-        const r = await fetch(`/api/freets/${this.freet._id}`, options);
+        //if params.url
+        var r;
+        if (params.url) {
+          r = await fetch(`${params.url}/${this.freet._id}`, options);
+        } else {
+          r = await fetch(`/api/freets/${this.freet._id}`, options);
+        }
+        // const r = await fetch(`/api/freets/${this.freet._id}`, options);
         if (!r.ok) {
           const res = await r.json();
           throw new Error(res.error);
@@ -168,8 +241,78 @@ export default {
 
 <style scoped>
 .freet {
-    border: 1px solid #111;
+    border-top: 0.5px solid #111;
+    /* border: none; */
     padding: 20px;
     position: relative;
+}
+
+.info {
+  color: rgb(170, 170, 170);
+  font-size: 12pt;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+}
+
+invisible {
+  border: 0px;
+
+}
+
+.row {
+  margin-top: 16px;
+  display: flex;
+}
+
+.row img {
+  width: auto;
+  max-width: 24px;
+  height: auto;
+  max-height: 24px;
+  background: url("../../../client/dist/img/hoverlike.png");
+}
+
+.row img.image-hover {
+  background: url("../../../client/dist/img/hoverlike.png");
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.row:hover img.image-hover {
+    opacity: 1;
+  }
+
+.row div {
+  padding: 12px;
+  margin-top: -12px;
+}
+
+button {
+  background-color: white; /* Green */
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  text-align: center;
+  color: black;
+  text-decoration: none;
+
+  font-size: 16px;
+}
+
+button:hover {
+  color: #729e85;
+}
+
+.column {
+  flex: 50%;
 }
 </style>

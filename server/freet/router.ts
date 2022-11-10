@@ -4,6 +4,7 @@ import FreetCollection from './collection';
 import UserCollection from '../user/collection';
 import * as userValidator from '../user/middleware';
 import * as freetValidator from '../freet/middleware';
+import * as upvoteValidator from '../upvote/middleware';
 ;import * as util from './util';
 
 const router = express.Router();
@@ -123,7 +124,7 @@ router.delete(
 /**
  * Modify a freet
  *
- * @name PUT /api/freets/:id
+ * @name PATCH /api/freets/:id
  *
  * @param {string} content - the new content for the freet
  * @return {FreetResponse} - the updated freet
@@ -133,7 +134,7 @@ router.delete(
  * @throws {400} - If the freet content is empty or a stream of empty spaces
  * @throws {413} - If the freet content is more than 140 characters long
  */
-router.put(
+ router.patch(
   '/:freetId?',
   [
     userValidator.isUserLoggedIn,
@@ -151,33 +152,62 @@ router.put(
 );
 
 /**
- * Get all the freets for a given page
+ * Upvote a freet
  *
- * @name GET /api/freets
+ * @name PUT /api/upvotes/:id
  *
- * @param {string} page - The page user wants to view
- * @return {FreetResponse[]} - A list of all the freets sorted in descending
- *                      order by date modified
+ * @return {string} - A success message
+ * @throws {403} - if the user is not logged in
+ * @throws {404} - If the freetId is not valid
  */
- router.get(
-  '/:page?',
+ router.put(
+  '/:freetId?',
+  [
+  //   userValidator.isUserLoggedIn,
+    freetValidator.isFreetExists,
+    upvoteValidator.hasNotUpvoted,
+  ],
+
   async (req: Request, res: Response) => {
-    let pageView;
-  
-    if (req.params.page == 'home') {
-      console.log('HOMEPAGE');
-      const user = UserCollection.findOneByUserId(req.session.userId);
-      const following = (await user).following;
-      pageView = await FreetCollection.findHomeFreets(following);
-    } else if (req.params.page == 'trending'){
-      pageView = await FreetCollection.findTrendingFreets();
-    }
-  //   const user = UserCollection.findOneByUserId(req.session.userId);
-  //   const following = (await user).following;
-  //   const homepage = await FreetCollection.findHomeFreets(following)
-    const response = pageView.map(util.constructFreetResponse);
-    res.status(200).json(response);
-  },
+      console.log("congrats");
+    const userId = (req.session.userId as string) ?? '';
+    const freet = await FreetCollection.upvoteOne(req.params.freetId, userId);
+    console.log(freet);
+    res.status(200).json({ 
+      message: 'The freet was upvoted successfully.',
+    });
+  }
 );
+
+// /**
+//  * Get all the freets for a given page
+//  *
+//  * @name GET /api/freets
+//  *
+//  * @param {string} page - The page user wants to view
+//  * @return {FreetResponse[]} - A list of all the freets sorted in descending
+//  *                      order by date modified
+//  */
+//  router.get(
+//   '/:page?',
+//   async (req: Request, res: Response) => {
+//     let pageView;
+  
+//     if (req.params.page == 'home') {
+//       const user = UserCollection.findOneByUserId(req.session.userId);
+//       const following = (await user).following;
+//       pageView = await FreetCollection.findHomeFreets(following);
+//     } else if (req.params.page == 'trending'){
+//       pageView = await FreetCollection.findTrendingFreets();
+//     } else if (req.params.page == 'drafts') {
+//       pageView = await FreetCollection.findDrafts(req.session.userId);
+//     }
+//   //   const user = UserCollection.findOneByUserId(req.session.userId);
+//   //   const following = (await user).following;
+//   //   const homepage = await FreetCollection.findHomeFreets(following)
+//     const response = pageView.map(util.constructFreetResponse);
+//     res.status(200).json(response);
+//   },
+// );
 
 export {router as freetRouter};

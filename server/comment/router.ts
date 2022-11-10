@@ -29,6 +29,7 @@ const router = express.Router();
     ],
     async (req: Request, res: Response) => {
       const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
+      console.log('hello what is up', userId, req.body.content, req.params.freetId);
       const comment = await CommentCollection.addComment(userId, req.body.content, req.params.freetId);
     
       res.status(200).json({
@@ -37,5 +38,31 @@ const router = express.Router();
       });
     }
   );
+
+  /**
+ * Delete a freet
+ *
+ * @name DELETE /api/freets/:id
+ *
+ * @return {string} - A success message
+ * @throws {403} - If the user is not logged in or is not the author of
+ *                 the freet
+ * @throws {404} - If the freetId is not valid
+ */
+router.delete(
+  '/:commentId?',
+  [
+    userValidator.isUserLoggedIn,
+    commentValidator.didUserComment,
+  ],
+  async (req: Request, res: Response) => {
+    await CommentCollection.deleteComment(req.params.commentId);
+    res.status(200).json({
+      message: 'Your comment was deleted successfully.'
+    });
+  }
+);
+
+
 export {router as commentRouter};
   

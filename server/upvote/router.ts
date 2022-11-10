@@ -21,13 +21,13 @@ const router = express.Router();
     [
     //   userValidator.isUserLoggedIn,
       freetValidator.isFreetExists,
-      upvoteValidator.hasNotUpvoted,
+      // upvoteValidator.hasNotUpvoted,
     ],
 
     async (req: Request, res: Response) => {
-        console.log("congrats");
+        console.log("congrats", req.session.userId);
       const userId = (req.session.userId as string) ?? '';
-      const freet = await FreetCollection.upvoteOne(req.params.freetId, userId);
+      const freet = await FreetCollection.upvoteOne(req.params.freetId, req.session.userId);
       res.status(200).json({
         message: 'The freet was upvoted successfully.',
       });

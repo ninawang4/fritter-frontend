@@ -4,6 +4,7 @@ import {Schema, model} from 'mongoose';
 export type Comment = {
     _id: Types.ObjectId,
     commenterId: Types.ObjectId,
+    username: string,
     content: string,
     dateCreated: Date,
 };
@@ -11,6 +12,7 @@ export type Comment = {
 export type PopulatedComment = {
     _id: Types.ObjectId,
     commenterId: Types.ObjectId,
+    username: string,
     content: string,
     dateCreated: Date,
 };
@@ -21,6 +23,11 @@ const CommentSchema = new Schema<Comment> ({
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'User'
+      },
+
+      username: {
+        type: String,
+        required: true
       },
 
       content: {

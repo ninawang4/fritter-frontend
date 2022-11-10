@@ -1,4 +1,5 @@
 import type {HydratedDocument, Types} from 'mongoose';
+import UserCollection from '../user/collection';
 import FreetCollection from '../freet/collection';
 import CommentModel from './model';
 
@@ -13,9 +14,13 @@ class CommentCollection {
    */
  static async addComment(commenterId: Types.ObjectId | string, content: string, freetId: Types.ObjectId | string): Promise<HydratedDocument<Comment>> {
     const parentFreet = await FreetCollection.findOne(freetId);
+    const user = await UserCollection.findOneByUserId(commenterId);
+    const username = user.username;
+    console.log(username);
     const date = new Date();
     const comment = new CommentModel({
       commenterId,
+      username,
       content,
       dateCreated: date,
     });
@@ -26,7 +31,18 @@ class CommentCollection {
     await parentFreet.save();
     return CommentModel.findOne({_id:commentId});
   }
-}
+
+  /**
+   * Delete a comment given comment Id
+   *
+   * @param {string} commentId - The userId of the commenter   * @return {Promise<HydratedDocument<Freet>>} - true if the freet has been upvoted, false otherwise
+   */
+ static async deleteComment(commentId: Types.ObjectId | string): Promise<boolean> {
+  const comment = await CommentModel.deleteOne({_id: commentId});
+  console.log(comment);
+  return comment !== null;
+  }
+};
 
 export default CommentCollection;
 

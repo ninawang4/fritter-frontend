@@ -27,6 +27,10 @@ export default {
         } else if (this.button === 'Trending Freets') {
             url = '/api/page?page=trending';
             this.$store.commit('updatePageview', 'trending');
+        } else if (this.button === 'Drafts') {
+            console.log('here');
+            url = '/api/page?page=drafts';
+            this.$store.commit('updatePageview', 'drafts');
         };
         this.value = '';
       try {

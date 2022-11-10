@@ -2,6 +2,7 @@ import type {HydratedDocument, Types} from 'mongoose';
 import type {Freet} from './model';
 import FreetModel from './model';
 import UserCollection from '../user/collection';
+import UserModel from 'server/user/model';
 // import CommentModel from '../comment/model';
 
 /**
@@ -112,6 +113,21 @@ class FreetCollection {
       return freets;
     }
 
+    /**
+   * Get all drafts
+   *
+   * @return {Promise<HydratedDocument<Freet>[]>} - An array of all of the freets in the home page
+   */
+     static async findDrafts(userId: Types.ObjectId | string): Promise<Array<HydratedDocument<Freet>>> {
+      const date = new Date();
+      // const username = (await UserCollection.findOneByUserId(freetId)).username;
+      let freets = await FreetModel.find({
+        authorId: userId,
+        scheduledTime : {$gte : date}
+      }).populate('authorId');
+      return freets;
+    }
+
 
   /**
    * Update a freet with the new content
@@ -158,10 +174,29 @@ class FreetCollection {
    */
  static async upvoteOne(freetId: Types.ObjectId | string, upvoterId:  Types.ObjectId | string): Promise<boolean> {
   const freet = await FreetModel.findOne({_id: freetId});
-  freet.upvoters.push(upvoterId);
-  await FreetModel.findOneAndUpdate({_id: freetId}, {
+  const user = await UserCollection.findOneByUserId(upvoterId);
+  const upvoters = freet.upvoters;
+  if (upvoters.includes(user.username)) {
+    const index = upvoters.findIndex((username) => username === user.username);
+    freet.upvoters.splice(index, 1);
+    FreetModel.findOneAndUpdate({_id: freetId}, {
+      $inc : {upvotes : -1, engagement : -1}
+    })
+  } else {
+    freet.upvoters.push(user.username);
+    console.log(FreetModel.findById({freetId}));
+    FreetModel.findOneAndUpdate({_id: freetId}, {
+      $inc : {upvotes : 1, engagement : 1}
+    });
+    console.log(freet.upvotes);
+  };
+  FreetModel.findOneAndUpdate({_id: freetId}, {
     $inc : {upvotes : 1, engagement : 1}
   });
+  console.log(freet.upvotes);
+  //   .then(freet => console.log(freet))
+  //   .catch( e => console.error(e));
+  // console.log(upvoterId);
   await freet.save();
   return freet.populate('authorId');
   }

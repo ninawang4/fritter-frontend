@@ -4,9 +4,12 @@
   <main>
     <section v-if="$store.state.username">
       <header>
-        <h2>Welcome @{{ $store.state.username }}</h2>
+        <h1>Welcome {{ $store.state.username }}!</h1>
+        <button @click="createFreet">Create a Freet!</button>
       </header>
-      <CreateFreetForm />
+      <div v-if="creatingFreet === true">
+        <CreateFreetForm />
+      </div>
     </section>
     <section v-else>
       <header>
@@ -56,6 +59,11 @@
             value="view-all"
             button="View all Freets"
           />
+          <GetPageView
+            ref="getPageView"
+            value="draft"
+            button="Drafts"
+          />
         </div>
 
         <div class="right">
@@ -63,7 +71,7 @@
             ref="getFreetsForm"
             value="author"
             placeholder="🔍 Filter by author (optional)"
-            button="🔄 Get freets"
+            button="Get freets"
           />
         </div>
       </header>
@@ -96,6 +104,21 @@ export default {
   components: {FreetComponent, GetFreetsForm, GetPageView, CreateFreetForm},
   mounted() {
     this.$refs.getFreetsForm.submit();
+  },
+  data() {
+    return {
+      creatingFreet: false,
+    };
+  },
+  methods: {
+    createFreet() {
+      if (this.creatingFreet === false) {
+        this.creatingFreet = true;
+      } else {
+        this.creatingFreet = false;
+      }
+      
+    }
   }
 };
 </script>
@@ -104,12 +127,19 @@ export default {
 section {
   display: flex;
   flex-direction: column;
+  /* background-color: #abd6be; */
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 header, header > * {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+header h1 {
+  color: #729e85;
+  font-size: 36pt;
 }
 
 button {
@@ -121,4 +151,16 @@ section .scrollbox {
   padding: 3%;
   overflow-y: scroll;
 }
+
+button {
+  background-color: #abd6be; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
 </style>

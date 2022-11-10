@@ -51,7 +51,19 @@ form {
 }
 
 input {
-    padding: 0 5px;
+    padding: 6px;
     min-width: 200px;
 }
+
+button {
+  background-color: #abd6be; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
 </style>
