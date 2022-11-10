@@ -272,11 +272,9 @@ invisible {
   max-width: 24px;
   height: auto;
   max-height: 24px;
-  background: url("../../../client/dist/img/hoverlike.png");
 }
 
 .row img.image-hover {
-  background: url("../../../client/dist/img/hoverlike.png");
   position: absolute;
   top: 0;
   right: 0;
