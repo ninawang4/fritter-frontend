@@ -53,13 +53,13 @@
         </button>
       </div>
     <div class="row">
-        <img v-if="upvoted" src="../../../client/dist/img/likedalready.png" @click="upvoteFreet"/>
+        <img v-if="upvoted" src="../../../client/public/images/likedalready.png" @click="upvoteFreet"/>
 
-          <img v-else src="../../../client/dist/img/newlike.png" @click="upvoteFreet"/>
+          <img v-else src="../../../client/public/images/newlike.png" @click="upvoteFreet"/>
           <div>{{freet.upvotes}} likes</div>
           <br />
 
-          <img src="../../../client/dist/img/comments.png" margin="12px" @click="showComments"/>
+          <img src="../../../client/public/images/comments.png" margin="12px" @click="showComments"/>
           <div>{{comments.length}} comments</div>
     </div>
     <section v-if="commentView">
